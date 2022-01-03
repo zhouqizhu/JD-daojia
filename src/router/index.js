@@ -8,6 +8,12 @@ const routes = [
     component: () => import(/* webpackChunkName: "home" */ '../views/home/Home')
   },
   {
+    path: '/CartList',
+    name: 'CartList',
+    // 异步路由
+    component: () => import(/* webpackChunkName: "CartList" */ '../views/cartList/CartList')
+  },
+  {
     path: '/register',
     name: 'Register',
     component: () => import(/* webpackChunkName: "register" */ '../views/register/Register')

@@ -1,38 +1,41 @@
 <template>
-    <div class="content">
-        <div class="category">
-            <div :class="{'category__item': true, 'category__item--active': currentTab === item.name}"
-            v-for="item in categories"
-            :key="item.name"
-            @click="() => handleCategoryClick(item.tab)"
-            >
-            {{item.name}}
-            </div>
-        </div>
-        <div class="product">
-            <div class="prduct__item" v-for="item in list" :key="item._id">
-                <img class="product__item__img" src="" alt="">
-                <div class="product__item__detail">
-                    <h4 class="product__item">{{item.name}}</h4>
-                    <p class="product__item__sales">{{item.sales}}</p>
-                    <p class="product__item__price">
-                      <span class="product__item__yen"></span>{{item.price}}
-                      <span class="product__item__origin">{{item.oldPrice}}</span>
-                    </p>
-                </div>
-            </div>
-            <div class="product__number">
-              <span class="product__number__minus">-</span>
-              <span class="priduct__number__plus">+</span>
-            </div>
-        </div>
+  <div class="content">
+    <div class="category">
+      <div
+        :class="{'category__item': true, 'category__item--active': currentTab === item.tab}"
+        v-for="item in categories" :key="item.name"
+        @click="() => handleTabClick(item.tab)"
+      >{{item.name}}
+      </div>
     </div>
+    <div class="product">
+      <div class="prduct__item" v-for="item in list" :key="item._id">
+        <img class="product__item__img" :src="item.imgUrl" />
+        <div class="product__item__detail">
+          <h4 class="product__item__title">{{item.name}}</h4>
+          <p class="product__item__sales">月售 {{item.sales}}件</p>
+          <p class="product__item__price">
+            <span class="product__item__yen">&yen;</span>{{item.price}}
+            <span class="product__item__origin">&yen;{{item.oldPrice}}</span>
+          </p>
+        </div>
+        <div class="product__number">
+          <span class="product__number__minus" @click="() => { changeCartItem(shopId, item._id, item, -1, shopName) }">-</span>
+           {{getProductCartCount(shopId, item._id)}}
+          <span class="product__number__plus" @click="changeCartItem(shopId, item._id, item, 1, shopName)">+</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
 import { reactive, ref, toRefs } from '@vue/reactivity'
 import { get } from '../../utils/request'
 import { watchEffect } from '@vue/runtime-core'
+import { useRoute } from 'vue-router'
+import { useCommonCartEffect } from './commonCartEffect'
+import { useStore } from 'vuex'
 
 const categories = [
   { name: '全部商品', tab: 'all' },
@@ -60,12 +63,33 @@ const useCurrentListEffect = (currentTab, shopId) => {
   const { list } = toRefs(content)
   return { list }
 }
+// 购物车相关逻辑
+const useCartEffect = () => {
+  const store = useStore()
+  const { cartList, changeCartItemInfo } = useCommonCartEffect()
+  const changeShopName = (shopId, shopName) => {
+    store.commit('changeShopName', { shopId, shopName })
+  }
+  const changeCartItem = (shopId, productId, item, num, shopName) => {
+    changeCartItemInfo(shopId, productId, item, num)
+    changeShopName(shopId, shopName)
+  }
+  const getProductCartCount = (shopId, productId) => {
+    return cartList?.[shopId]?.productList?.[productId]?.count || 0
+  }
+  return { cartList, changeCartItem, getProductCartCount }
+}
+
 export default {
   name: 'Content',
+  props: ['shopName'],
   setup () {
+    const route = useRoute()
+    const shopId = route.params.id
     const { currentTab, handleTabClick } = useTabEffect()
-    const { list } = useCurrentListEffect(currentTab)
-    return { list, currentTab, handleTabClick, categories }
+    const { list } = useCurrentListEffect(currentTab, shopId)
+    const { changeCartItem, cartList, getProductCartCount } = useCartEffect()
+    return { list, shopId, changeCartItem, currentTab, getProductCartCount, handleTabClick, categories, cartList }
   }
 }
 </script>
@@ -89,8 +113,8 @@ export default {
   &__item {
     line-height: .4rem;
     text-align: center;
-    font-size: .14rem;
-    color: $content-fontcolor;
+    font-size: 14px;
+    color: #333;
     &--active {
       background: $bgColor;
     }
@@ -112,6 +136,7 @@ export default {
       width: .68rem;
       height: .68rem;
       margin-right: .16rem;
+      float: left;
     }
     &__title {
       margin: 0;
@@ -141,23 +166,29 @@ export default {
       color: $light-fontColor;
       text-decoration: line-through;
     }
-    .product__number {
-      position: absolute;
-      right: 0;
-      bottom: .12rem;
-      line-height: .18rem;
-      &__minus {
-        position: relative;
-        top: .02rem;
-        color: $medium-fontColor;
-        margin-right: .05rem;
-      }
-      &__plus {
-        position: relative;
-        top: .02rem;
-        color: $btn-bgColor;
-        margin-left: .05rem;
-      }
+  }
+  &__number {
+    position: relative;
+    padding-left: 2.5rem;
+    bottom: .12rem;
+    &__minus, &__plus {
+      display: inline-block;
+      width: .2rem;
+      height: .2rem;
+      line-height: .16rem;;
+      border-radius: 50%;
+      font-size: .2rem;
+      text-align: center;
+    }
+    &__minus {
+      border: .01rem solid $medium-fontColor;
+      color: $medium-fontColor;
+      margin-right: .05rem;
+    }
+    &__plus {
+      background: $btn-bgColor;
+      color: $bgColor;
+      margin-left: .05rem;
     }
   }
 }
