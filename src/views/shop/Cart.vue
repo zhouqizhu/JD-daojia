@@ -12,26 +12,24 @@
           <span class="product__header__clear__btn" @click="cleanCartProducts(shopId)">清空购物车</span>
         </div>
       </div>
-      <template v-for="item in productList" :key="item._id">
-        <div class="prduct__item" v-if="item.count > 0">
-          <div class="product__item__checked iconfont"
-           v-html=" item.check ? '&#xe601;': '&#xe7ae;' "
-           @click="changeCartItemChecked(shopId, item._id)" />
-          <img class="product__item__img" :src="item.imgUrl" />
-            <div class="product__item__detail">
-              <h4 class="product__item__title">{{item.name}}</h4>
-              <p class="product__item__price">
-                <span class="product__item__yen">&yen;</span>{{item.price}}
-                <span class="product__item__origin">&yen;{{item.oldPrice}}</span>
-              </p>
-            </div>
-            <div class="product__number">
-              <span class="product__number__minus" @click="() => { changeCartItemInfo(shopId, item._id, item, -1) }">-</span>
-              {{item.count || 0}}
-              <span class="product__number__plus" @click="() => { changeCartItemInfo(shopId, item._id, item, 1) }">+</span>
-            </div>
-        </div>
-      </template>
+      <div class="prduct__item" v-for="item in productList" :key="item._id">
+        <div class="product__item__checked iconfont"
+          v-html=" item.check ? '&#xe601;': '&#xe7ae;' "
+          @click="changeCartItemChecked(shopId, item._id)" />
+        <img class="product__item__img" :src="item.imgUrl" />
+          <div class="product__item__detail">
+            <h4 class="product__item__title">{{item.name}}</h4>
+            <p class="product__item__price">
+              <span class="product__item__yen">&yen;</span>{{item.price}}
+              <span class="product__item__origin">&yen;{{item.oldPrice}}</span>
+            </p>
+          </div>
+          <div class="product__number">
+            <span class="product__number__minus" @click="() => { changeCartItemInfo(shopId, item._id, item, -1) }">-</span>
+            {{item.count || 0}}
+            <span class="product__number__plus" @click="() => { changeCartItemInfo(shopId, item._id, item, 1) }">+</span>
+          </div>
+      </div>
     </div>
     <div class="check">
       <div class="check__icon">
@@ -41,8 +39,8 @@
         <div class="check__icon__tag">{{calculations.total}}</div>
       </div>
       <div class="check__info">总计：<span class="check__info__price">&yen; {{calculations.price}}</span></div>
-      <div class="check__btn">
-        <router-link :to="{name: 'Home'}">
+      <div class="check__btn" v-show="calculations.total > 0">
+        <router-link :to="{path: `/OrderConfirmation/${shopId}`}">
         去结算
         </router-link>
       </div>
@@ -51,36 +49,15 @@
 </template>
 
 <script>
-import { computed, ref } from '@vue/reactivity'
+import { ref } from '@vue/reactivity'
 import { useRoute } from 'vue-router'
 import { useStore } from 'vuex'
-import { useCommonCartEffect } from './commonCartEffect'
+import { useCommonCartEffect } from '../../effects/cartEffects'
 
 // 获取购物车信息逻辑
 const useCartEffect = (shopId) => {
   const store = useStore()
-  const { cartList, changeCartItemInfo } = useCommonCartEffect()
-
-  const calculations = computed(() => {
-    const productList = cartList[shopId]?.productList
-    // 总数，总价，全选
-    const result = { total: 0, price: 0, allChecked: true }
-    if (productList) {
-      for (const i in productList) {
-        const product = productList[i]
-        result.total += product.count
-        if (product.check) result.price += (product.count * product.price)
-        if (product.count > 0 && !product.check) result.allChecked = false
-      }
-    }
-
-    result.price = result.price.toFixed(2)
-    return result
-  })
-  const productList = computed(() => {
-    const productList = cartList[shopId]?.productList || []
-    return productList
-  })
+  const { productList, calculations, changeCartItemInfo } = useCommonCartEffect()
 
   const changeCartItemChecked = (shopId, productId) => {
     store.commit('changeCartItemChecked', { shopId, productId })

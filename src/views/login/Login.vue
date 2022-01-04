@@ -49,7 +49,7 @@ const useLoginEffect = (showToast) => {
       } else {
         showToast('登陆失败')
       }
-    } catch (error) {
+    } catch (e) {
       showToast('请求失败')
     }
   }

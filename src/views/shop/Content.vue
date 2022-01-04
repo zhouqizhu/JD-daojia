@@ -34,7 +34,7 @@ import { reactive, ref, toRefs } from '@vue/reactivity'
 import { get } from '../../utils/request'
 import { watchEffect } from '@vue/runtime-core'
 import { useRoute } from 'vue-router'
-import { useCommonCartEffect } from './commonCartEffect'
+import { useCommonCartEffect } from '../../effects/cartEffects'
 import { useStore } from 'vuex'
 
 const categories = [
@@ -114,7 +114,7 @@ export default {
     line-height: .4rem;
     text-align: center;
     font-size: 14px;
-    color: #333;
+    color: $content-fontcolor;
     &--active {
       background: $bgColor;
     }

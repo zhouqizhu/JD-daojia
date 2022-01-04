@@ -8,10 +8,22 @@ const routes = [
     component: () => import(/* webpackChunkName: "home" */ '../views/home/Home')
   },
   {
-    path: '/CartList',
+    path: '/cartList',
     name: 'CartList',
     // 异步路由
     component: () => import(/* webpackChunkName: "CartList" */ '../views/cartList/CartList')
+  },
+  {
+    path: '/orderConfirmation/:id',
+    name: 'OrderConfirmation',
+    // 异步路由
+    component: () => import(/* webpackChunkName: "OrderConfirmation" */ '../views/orderConfirmation/OrderConfirmation')
+  },
+  {
+    path: '/orderList',
+    name: 'OrderList',
+    // 异步路由
+    component: () => import(/* webpackChunkName: "OrderConfirmation" */ '../views/orderList/OrderList')
   },
   {
     path: '/register',
