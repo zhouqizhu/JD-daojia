@@ -1,5 +1,5 @@
 <template>
-<div class="mask" v-if="showCart && calculations.total > 0" @click="handleCartShowChange"></div>
+  <div class="mask" v-if="showCart && calculations.total > 0" @click="handleCartShowChange"></div>
   <div class="cart">
     <div class="product" v-if="showCart && calculations.total > 0">
       <div class="product__header">
@@ -25,9 +25,9 @@
             </p>
           </div>
           <div class="product__number">
-            <span class="product__number__minus" @click="() => { changeCartItemInfo(shopId, item._id, item, -1) }">-</span>
+            <span class="product__number__minus iconfont" @click="() => { changeCartItemInfo(shopId, item._id, item, -1) }">&#xe821;</span>
             {{item.count || 0}}
-            <span class="product__number__plus" @click="() => { changeCartItemInfo(shopId, item._id, item, 1) }">+</span>
+            <span class="product__number__plus iconfont" @click="() => { changeCartItemInfo(shopId, item._id, item, 1) }">&#xe604;</span>
           </div>
       </div>
     </div>
@@ -39,9 +39,9 @@
         <div class="check__icon__tag">{{calculations.total}}</div>
       </div>
       <div class="check__info">总计：<span class="check__info__price">&yen; {{calculations.price}}</span></div>
-      <div class="check__btn" v-show="calculations.total > 0">
+      <div class="check__btn" v-if="calculations.total > 0">
         <router-link :to="{path: `/OrderConfirmation/${shopId}`}">
-        去结算
+          去结算
         </router-link>
       </div>
     </div>
@@ -123,7 +123,7 @@ export default {
   &__header {
     display: flex;
     line-height: .52rem;
-    border-bottom: 1px solid $content-bgColor;
+    border-bottom: .01rem solid $content-bgColor;
     font-size: .14rem;
     color: $content-fontcolor;
     &__all {
@@ -193,26 +193,19 @@ export default {
   }
   &__number {
     position: relative;
-    float: right;
-    right: .2rem;
-    bottom: .26rem;
-    &__minus, &__plus {
-      display: inline-block;
-      width: .2rem;
-      height: .2rem;
-      line-height: .16rem;;
-      border-radius: 50%;
-      font-size: .2rem;
-      text-align: center;
-    }
+    padding-left: 2.5rem;
+    bottom: .12rem;
+    line-height: .18rem;
     &__minus {
-      border: .01rem solid $medium-fontColor;
+      position: relative;
+      top: .02rem;
       color: $medium-fontColor;
       margin-right: .05rem;
     }
     &__plus {
-      background: $btn-bgColor;
-      color: $bgColor;
+      position: relative;
+      top: .02rem;
+      color: $btn-bgColor;
       margin-left: .05rem;
     }
   }
